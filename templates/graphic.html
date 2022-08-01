@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Внести данные по продажам{% endblock %}
+
+{% block content %}
+    <main class='card'>
+      
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
+      <canvas id="chart"></canvas>
+      <script>
+        let ctx = document.getElementById("chart").getContext("2d");
+        let chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: [
+            {% for item in result.labels %}
+              "{{ item }}",
+            {% endfor %}
+            ],
+            datasets: [
+              {
+                label: "Фото",
+                backgroundColor: "#79AEC8",
+                borderColor: "#417690",
+                data: {{ result.photoes }}
+              },
+              {
+                label: "видео",
+                backgroundColor: "#000080",
+                borderColor: "#417690",
+                data: {{ result.videos }}
+              },
+              {
+                label: "доход",
+                backgroundColor: "#00cccc",
+                borderColor: "#417690",
+                data: {{ result.incomes }}
+              },
+                      ]
+                },
+        options: {
+          title: {
+          text: "Суммарные продажи за месяц",
+          display: true
+                  }
+                  }
+                                    });
+      </script>
+    </main>
+{% endblock %}

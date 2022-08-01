@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Загрузки{% endblock %}
+
+{% block content %}
+
+<main class='card'>
+  <section class='card__header'>
+    {% include 'includes/header.html' %}
+  </section>
+  <section class='card__body'>
+    <ul class='card__body--days'>
+      <li>mon</li>
+      <li>tue</li>
+      <li>wed</li>
+      <li>thu</li>
+      <li>fri</li>
+      <li>sat</li>
+      <li>sun</li>
+    </ul>
+    <ul class='card__body--dates'>
+      {% for day in days %}
+        {% if day.date == 0 %}<li> </li>
+        {% else %}
+        <li>
+        <section>
+          <p>{{ day.date }}</p>
+        </section>
+        <section>
+          <a class='link' href="{% url 'input' year month_obj.month_list day.date %}">{{ day.photo }}</a>
+          <a class='link' href="{% url 'input' year month_obj.month_list day.date %}">{{ day.video }}</a>
+        </section>
+        </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+  </section>
+</main>
+{% endblock %}

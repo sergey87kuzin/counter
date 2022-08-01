@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Внести данные по продажам{% endblock %}
+
+{% block content %}
+<div class="parent">
+    <div class='header'>
+        {% include 'includes/header.html' %}
+    </div>
+    <div class='row'>
+        <div class='total_cell'>
+        <div class='total'>
+            <div class='total_row'>
+                {% for header_cell in header_cells %}
+                    <div class='total_cell'>
+                        {{ header_cell }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% for stock in stocks %}
+                <div class='total_row'>
+                    {% for stock_cell in stock %}
+                        <div class='total_cell'>
+                            {{ stock_cell }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+        </div>
+        <div class='total_cell'>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
+            <canvas id="chart"></canvas>
+            <script>
+                let ctx = document.getElementById("chart").getContext("2d");
+                let chart = new Chart(ctx, {
+                    type: "pie",
+                    data: {
+                        labels: [
+                            {% for item in labels %}
+                                "{{ item }}",
+                            {% endfor %}
+                        ],
+                        datasets: [
+                            {
+                                label: "Gross volume ($)",
+                                backgroundColor: "#79AEC8",
+                                borderColor: "#417690",
+                                data: {{ photo }}
+                            }
+                        ]
+                    },
+                    options: {
+                        title: {
+                            text: 'Продажи фото',
+                            display: true
+                        }
+                    }
+                });
+            </script>
+        </div>
+        <div class='total_cell'>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
+            <canvas id="chart2"></canvas>
+            <script>
+                let ctx2 = document.getElementById("chart2").getContext("2d");
+                let chart2 = new Chart(ctx2, {
+                    type: "pie",
+                    data: {
+                        labels: [
+                            {% for item in labels %}
+                                "{{ item }}",
+                            {% endfor %}
+                        ],
+                        datasets: [
+                            {
+                                label: "Видео, шт",
+                                backgroundColor: "#79AEC8",
+                                borderColor: "#417690",
+                                data: {{ video }}
+                            }
+                        ]
+                    },
+                    options: {
+                        title: {
+                            text: 'Продажи видео',
+                            display: true
+                        }
+                    }
+                });
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}

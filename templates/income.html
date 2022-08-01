@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Внести данные по продажам{% endblock %}
+
+{% block content %}
+    <div class="parent">
+        <div class='header'>
+            {% include 'includes/header.html' %}
+        </div>
+        <div class='row'>
+            <div class="inner"></div>
+            <div class="inner">
+                <div class="block">
+                    <form class='form' method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <p><label for='{{ field.id_for_label }}'>{{ field.label }}</label>
+                            {% if field.name == 'date' %}
+                                <input type='date' name='{{ field.name }}' id='{{ field.id_for_label }}'></p>
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+                        {% endfor %}
+                        <br>
+                        <button type="submit">Перейти</button>
+                    </form>
+                    {% if form.errors %}
+                    <div class="okno">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div>
+                                    {{ error|escape }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <div>
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

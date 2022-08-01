@@ -1,0 +1,41 @@
+<style>
+    ul.hr {
+     margin: 0; /* Обнуляем значение отступов */
+     padding: 4px; /* Значение полей */
+     vertical-align: top;
+    }
+    ul.hr li {
+     display: inline; /* Отображать как строчный элемент */
+     margin-right: 5px; /* Отступ слева */
+     padding: 3px; /* Поля вокруг текста */
+     pointer-events: auto;
+     max-width: 30%;
+    }
+   </style>
+<div class='inner'>
+    <form method="post">
+        {% csrf_token %}
+        <ul class="hr">
+            <li>{{ month }} {{ year }} </li>
+            {% for field in header_form %}
+                <li>
+                    {{ field }}
+                </li>
+            {% endfor %}
+            <li><button type='submit'>К загрузкам</button></li>
+        </ul>
+    </form>
+</div>
+<div class='inner'></div>
+    <div class='inner'>
+        <div class='nav'>
+            <div><a href='#'>Меню</a>
+                <ul>
+                    <li><a href='{% url "index" %}'>Домой</a></li>
+                    <li><a href='{% url "graphic" %}'>Построить график</a></li>
+                    <li><a href='{% url "create_stock" %}'>Добавить сток в список</a></li>
+                    <li><a href='{% url "total" %}'>Общий итог</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>

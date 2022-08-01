@@ -1,0 +1,49 @@
+body {
+    --container_background_color: rgb(227, 238, 238);
+    --container_border_color: rgb(224, 122, 26);
+    --body_background_color: rgba(182, 190, 186, 0.959);
+}
+
+body {
+    background: var(--body_background_color);
+    font: 18px Arial, sans-serif;
+    height: 100vh;
+    width: 100vw;
+  }
+  h1 {
+      text-align: center;
+      vertical-align: middle;
+  }
+.container {
+    height: 90%;
+    width: 90%;
+    background-color: var(--container_background_color);
+    margin-left: 5%;
+    margin-top: 5%;
+    border-color: var(--container_border_color);
+    border-width: thick;
+    border-style: solid;
+    border-radius: 3%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.table{
+    position: relative;
+    width: 80%;
+    height: 10%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+.cell {
+    width: 12%;
+    height: 100%;
+    margin: auto;
+    text-align: center;
+    vertical-align: middle;
+    padding: 1px 1px;
+    border: 1px solid rgb(114, 208, 231);
+}

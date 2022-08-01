@@ -1,0 +1,25 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Статистика стоков{% endblock %}
+
+{% block content %}
+  <body>
+    <div class="parent">
+      <div class='header'>
+          {% include 'includes/header.html' %}
+        </div>
+      <div class='row'>
+        <div class="inner"></div>
+        <div class="inner">
+          <p class="block">
+            <a class='reference' href="{% url 'months' year month_number %}">Загрузки</a>
+            <br>
+            <a class='reference' href="{% url 'income' %}">Продажи</a>
+          </p>
+      </div>
+    </div>
+  </div>
+</body>
+{% endblock %}
+</html>
