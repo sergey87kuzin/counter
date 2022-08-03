@@ -15,7 +15,7 @@ class DayAdmin(admin.ModelAdmin):
 
 
 class StockAdmin(admin.ModelAdmin):
-    list_display = ('name', 'pseudo_name',)
+    list_display = ('user', 'name', 'pseudo_name',)
 
 
 class StockCountAdmin(admin.ModelAdmin):

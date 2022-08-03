@@ -6,17 +6,17 @@
 
 <main class='card'>
   <section class='card__header'>
+    <div class='header'>
     {% include 'includes/header.html' %}
+    </div>
   </section>
   <section class='card__body'>
     <ul class='card__body--days'>
-      <li>mon</li>
-      <li>tue</li>
-      <li>wed</li>
-      <li>thu</li>
-      <li>fri</li>
-      <li>sat</li>
-      <li>sun</li>
+      {% for name in header_names %}
+        <li>
+          {{ name }}
+        </li>
+      {% endfor %}
     </ul>
     <ul class='card__body--dates'>
       {% for day in days %}

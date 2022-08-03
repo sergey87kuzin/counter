@@ -1,10 +1,15 @@
 from django import forms
+from crum import get_current_user
 
 from .models import Stock
 from .vars import graphics, months, years
+# from .vars import stocks
 
-stock_list = Stock.objects.all()
-stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
+
+def get_stocks():
+    stock_list = Stock.objects.filter(user=get_current_user())
+    stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
+    return stocks
 
 
 class MonthForm(forms.Form):
@@ -18,7 +23,8 @@ class InputForm(forms.Form):
 
 
 class GraphicForm(forms.Form):
-    stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
+    stocks = get_stocks()
+    # stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
     year = forms.ChoiceField(choices=years, label='Год')
     month = forms.ChoiceField(choices=months, label='Месяц')
     graphic = forms.ChoiceField(choices=graphics, label='График')
@@ -26,21 +32,25 @@ class GraphicForm(forms.Form):
 
 
 class StockForm(forms.Form):
-    stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
+    stocks = get_stocks()
+    # stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
     date = forms.DateField(input_formats=['%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y'],
                            label='Дата',
                            localize=True)
     photo = forms.IntegerField(max_value=50,
                                min_value=0,
                                label='Фото',
-                               initial=0,)
+                               initial=0,
+                               required=False)
     video = forms.IntegerField(max_value=50,
                                min_value=0,
                                label='Видео',
-                               initial=0,)
+                               initial=0,
+                               required=False)
     income = forms.FloatField(max_value=9999,
                               label='Доход',
-                              initial=0,)
+                              initial=0,
+                              required=False)
     stock = forms.ChoiceField(choices=stocks, label='Сток')
 
 
@@ -53,7 +63,7 @@ class StockCreateForm(forms.ModelForm):
         cleaned_data = super().clean()
         name = cleaned_data.get('name')
         pseudo_name = cleaned_data.get('pseudo_name')
-        msg_empty = 'Заполните оба поле'
+        msg_empty = 'Заполните оба поля'
         msg_name_exists = 'Сток уже существует'
         msg_pseudo_exists = 'Псевдоним уже существует'
         if not name:
