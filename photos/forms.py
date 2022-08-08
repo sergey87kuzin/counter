@@ -1,5 +1,6 @@
 from django import forms
 from crum import get_current_user
+from datetime import datetime as dt
 
 from .models import Stock
 from .vars import graphics, months, years
@@ -13,13 +14,15 @@ def get_stocks():
 
 
 class MonthForm(forms.Form):
-    year = forms.ChoiceField(choices=years)
-    month = forms.ChoiceField(choices=months)
+    year = forms.ChoiceField(choices=years,
+                             initial=dt.now().year)
+    month = forms.ChoiceField(choices=months,
+                              initial=dt.now().month)
 
 
 class InputForm(forms.Form):
-    photo = forms.IntegerField(max_value=50, min_value=0, label='Photo')
-    video = forms.IntegerField(max_value=50, min_value=0, label='Video')
+    photo = forms.IntegerField(max_value=50, min_value=0, label='Фото')
+    video = forms.IntegerField(max_value=50, min_value=0, label='Видео')
 
 
 class GraphicForm(forms.Form):

@@ -1,27 +1,32 @@
 import calendar
 import datetime
+import logging
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
 from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect, render
+from datetime import datetime as dt
 
 from .forms import (GraphicForm,
                     InputForm,
                     MonthForm,
                     StockCreateForm,
-                    StockForm,
-                    get_stocks)
+                    StockForm)
 from .models import Day, Month, Stock, StockCount
 from .vars import total_header, header_names
 from .vars import months_list as months
 
 currentMonth = datetime.datetime.now().month - 1
 currentYear = datetime.datetime.now().year
+logger = logging.getLogger('django')
 
 
 @login_required
 def index(request):
     header_form = MonthForm(request.POST or None)
+    logger.warning(f'Home page { dt.now() }')
+    if 'header_button' in request.POST:
+        return go_to_month(request, header_form)
     return render(request, 'index.html', {'month': months[currentMonth],
                                           'month_number': currentMonth,
                                           'year': currentYear,
@@ -33,12 +38,9 @@ def month(request, year, month):
     curr_month = get_month(user=request.user, year=year, month=month)
     days = get_days(curr_month)
     header_form = MonthForm(request.POST or None)
-    if header_form.is_valid():
-        month = header_form.cleaned_data['month']
-        year = header_form.cleaned_data['year']
-        return redirect('months',
-                        year=year,
-                        month=month)
+    if 'header_button' in request.POST:
+        return go_to_month(request, header_form)
+    logger.warning(f'Month { month } of { year }, days={ days }. { dt.now() }')
     return render(request, 'month.html', {'year': year,
                                           'month': months[month-1],
                                           'header_form': header_form,
@@ -50,6 +52,9 @@ def month(request, year, month):
 @login_required
 def input_value(request, year, month, date):
     form = InputForm(request.POST or None)
+    header_form = MonthForm(request.POST or None)
+    if 'header_button' in request.POST:
+        return go_to_month(request, header_form)
     if form.is_valid():
         photo = form.cleaned_data['photo']
         video = form.cleaned_data['video']
@@ -59,17 +64,21 @@ def input_value(request, year, month, date):
         day.photo = photo
         day.video = video
         day.save()
+        logger.warning(f'Input downloads: date = { date }.{ month }.{ year }' +
+                       f', counts: photo = { photo }, video = { video },' +
+                       f' income = { income }. { dt.now() }')
         return redirect('months', year=year, month=month)
-    return render(request, 'income.html', {'form': form})
+    return render(request, 'income.html', {'form': form,
+                                           'header_form': header_form})
 
 
 @login_required
 def income(request):
-    stock_list = Stock.objects.filter(user=request.user)
-    stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
     form = StockForm(request.POST or None)
-    form.fields['stock'].choices = stocks
+    form.fields['stock'].choices = get_stock_list(request)
     header_form = MonthForm(request.POST or None)
+    if 'header_button' in request.POST:
+        return go_to_month(request, header_form)
     if form.is_valid():
         choosen_day = form.cleaned_data['date']
         year = choosen_day.year
@@ -97,6 +106,9 @@ def income(request):
             count[0].photo += photo
             count[0].income += income
             count[0].save()
+        logger.warning(f'changing income: { choosen_day }, video = { video }' +
+                       f', photo = { photo }, income = { income }.'
+                       f'{ dt.now() }')
         return redirect('index')
     return render(request, 'income.html', {'form': form,
                                            'header_form': header_form,
@@ -108,9 +120,13 @@ def income(request):
 def create_stock(request):
     form = StockCreateForm(request.POST or None)
     header_form = MonthForm(request.POST or None)
+    if 'header_button' in request.POST:
+        return go_to_month(request, header_form)
     if form.is_valid():
         form.instance.user = request.user
         form.save()
+        logger.warning(f'stock created: name = { form.cleaned_data["name"] }' +
+                       f', pseudo_name = { form.cleaned_data["pseudo_name"] }')
         return redirect('index')
     return render(request, 'income.html', {'form': form,
                                            'header_form': header_form,
@@ -120,11 +136,11 @@ def create_stock(request):
 
 @login_required
 def graphic(request):
-    stock_list = Stock.objects.filter(user=request.user)
-    stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
     form = GraphicForm(request.POST or None)
-    form.fields['stock'].choices = stocks
+    form.fields['stock'].choices = get_stock_list(request)
     header_form = MonthForm(request.POST or None)
+    if 'header_button' in request.POST:
+        return go_to_month(request, header_form)
     if form.is_valid():
         chosen_month = int(form.cleaned_data['month'])
         chosen_year = form.cleaned_data['year']
@@ -158,10 +174,13 @@ def graphic(request):
 def total(request):
     form = MonthForm(request.POST or None)
     header_form = MonthForm(request.POST or None)
+    if 'header_button' in request.POST:
+        return go_to_month(request, header_form)
     stocks_table = []
     labels = []
     photoes_count = []
     video_count = []
+    incomes = []
     if form.is_valid():
         month = get_month(user=request.user,
                           year=form.cleaned_data['year'],
@@ -170,13 +189,12 @@ def total(request):
         stock_list = Stock.objects.filter(user=request.user)
         for stock in stock_list:
             counts = get_counts(days=days, stock=stock)
-            photoes = sum([int(count.photo) for count in counts])
-            videos = sum([int(count.video) for count in counts])
-            incomes = sum([float(count.income) for count in counts])
-            stock_line = [stock.pseudo_name, photoes, videos, incomes]
+            append_incomes(video_count, photoes_count, incomes, counts)
+            stock_line = [stock.pseudo_name,
+                          photoes_count[-1],
+                          video_count[-1],
+                          incomes[-1]]
             labels.append(stock.pseudo_name)
-            photoes_count.append(photoes)
-            video_count.append(videos)
             stocks_table.append(stock_line)
         return render(request, 'total.html',
                       {'header_form': header_form,
@@ -207,6 +225,7 @@ def get_month(user, year, month):
 def get_days(month):
     curr_days = Day.objects.filter(month=month)
     if not curr_days:
+        curr_days = []
         dates = calendar.monthcalendar(year=int(month.year_list),
                                        month=int(month.month_list))
         days = [Day(date=date, month=month, photo=0, video=0)
@@ -214,6 +233,7 @@ def get_days(month):
         with transaction.atomic():
             for day in days:
                 day.save()
+                curr_days.append(day)
     return curr_days
 
 
@@ -248,12 +268,7 @@ def year_graphic(year, stock):
         month = get_month(user=stock.user, year=year, month=month_num+1)
         days = get_days(month=month)
         counts = get_counts(days=days, stock=stock)
-        day_photoes = [int(count.photo) for count in counts]
-        day_videos = [int(count.video) for count in counts]
-        day_incomes = [float(count.income) for count in counts]
-        photoes.append(sum(day_photoes))
-        videos.append(sum(day_videos))
-        incomes.append(sum(day_incomes))
+        append_incomes(videos, photoes, incomes, counts)
     labels = [months[month] for month in range(12)]
     result = {'photoes': photoes,
               'videos': videos,
@@ -271,15 +286,30 @@ def month_diagram(request, month):
     for stock in stocks:
         days = get_days(month=month)
         counts = get_counts(days=days, stock=stock)
-        day_photoes = [int(count.photo) for count in counts]
-        day_videos = [int(count.video) for count in counts]
-        day_incomes = [float(count.income) for count in counts]
-        photoes.append(sum(day_photoes))
-        videos.append(sum(day_videos))
-        incomes.append(sum(day_incomes))
+        append_incomes(videos, photoes, incomes, counts)
         labels.append(stock.pseudo_name)
     result = {'photoes': photoes,
               'videos': videos,
               'incomes': incomes,
               'labels': labels}
     return result
+
+
+def go_to_month(request, header_form):
+    if header_form.is_valid():
+        logger.warning('redirect to month')
+        return redirect('months',
+                        int(header_form.cleaned_data['year']),
+                        int(header_form.cleaned_data['month']))
+
+
+def get_stock_list(request):
+    stock_list = Stock.objects.filter(user=request.user)
+    stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
+    return stocks
+
+
+def append_incomes(videos, photoes, incomes, counts):
+    photoes.append(sum([int(count.photo) for count in counts]))
+    videos.append(sum([int(count.video) for count in counts]))
+    incomes.append(sum([float(count.income) for count in counts]))

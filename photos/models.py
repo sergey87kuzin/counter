@@ -68,12 +68,24 @@ class Stock(models.Model):
                             max_length=32)
     pseudo_name = models.CharField(verbose_name='Псевдоним',
                                    max_length=32,
-                                   default='Новый сток')
+                                   help_text='Новый сток')
     day = models.ManyToManyField('Day',
                                  related_name='stock_day',
                                  through='StockCount',
                                  verbose_name='Дата',
                                  blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'name'],
+                name='uniq_name',
+            ),
+            models.UniqueConstraint(
+                fields=['user', 'pseudo_name'],
+                name='uniq_pseudo_name',
+            ),
+        ]
 
     def __str__(self):
         return self.pseudo_name

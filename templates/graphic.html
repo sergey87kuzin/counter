@@ -4,6 +4,12 @@
 
 {% block content %}
     <main class='card'>
+        <section class='card__header'>
+          <div class='header'>
+          {% include 'includes/header.html' %}
+          </div>
+        </section>
+        <section class='card__body'>
       
       <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
       <canvas id="chart"></canvas>
@@ -46,5 +52,6 @@
                   }
                                     });
       </script>
+      </section>
     </main>
 {% endblock %}
