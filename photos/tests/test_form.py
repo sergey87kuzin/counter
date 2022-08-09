@@ -60,8 +60,6 @@ class MonthFormTests(TestCase):
                 )
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
-        # self.assertEqual(form.fields['year'].label, 'Год')
-
     def test_initial(self):
         form_data = {'header_button': True}
         form = MonthForm(data=form_data)

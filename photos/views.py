@@ -69,7 +69,9 @@ def input_value(request, year, month, date):
                        f' income = { income }. { dt.now() }')
         return redirect('months', year=year, month=month)
     return render(request, 'income.html', {'form': form,
-                                           'header_form': header_form})
+                                           'header_form': header_form,
+                                           'year': currentYear,
+                                           'month': months[currentMonth]})
 
 
 @login_required
