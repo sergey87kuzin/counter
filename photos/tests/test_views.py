@@ -23,7 +23,10 @@ class ViewsTest(TestCase):
         cls.month = Month.objects.create(user=cls.user,
                                          year_list=cls.year,
                                          month_list=cls.month_no)
+        cls.next_month = Month.objects.create(
+            user=cls.user, year_list=cls.year, month_list=cls.month_no + 1)
         cls.days = get_days(cls.month)
+        get_days(cls.next_month)
         cls.stock = Stock.objects.create(
             user=cls.user, name='Pond5', pseudo_name='Pond5'
         )
@@ -31,6 +34,11 @@ class ViewsTest(TestCase):
         cls.day = Day.objects.get(date=cls.date, month=cls.month)
         StockCount.objects.create(
             photo=cls.photo, video=cls.video, day=cls.day,
+            stock=cls.stock, income=cls.income
+        )
+        cls.next_day = Day.objects.get(date=cls.date, month=cls.next_month)
+        StockCount.objects.create(
+            photo=cls.photo, video=cls.video, day=cls.next_day,
             stock=cls.stock, income=cls.income
         )
 
@@ -109,17 +117,55 @@ class ViewsTest(TestCase):
         self.assertListEqual(days, self.days)
 
     def test_post_request_to_graphic_page(self):
+        graphics = {'daily': (0, self.date),
+                    'monthly': (self.month_no, months[self.month_no]),
+                    'diagram': (0, self.stock.pseudo_name)}
         data1_form = {'year': self.year, 'month': self.month_no}
-        data2_form = {'year': self.year,
-                      'month': self.month_no,
-                      'graphic': 'dayly',
-                      'stock': self.stock.name}
-        data = {**data1_form, **data2_form}
+        for graphic, index in graphics.items():
+            with self.subTest():
+                data2_form = {'year': self.year,
+                              'month': self.month_no,
+                              'graphic': graphic,
+                              'stock': self.stock.name}
+                data = {**data1_form, **data2_form}
+                response = self.authorized_client.post(
+                    reverse('graphic'), data=data, follow=True
+                )
+                form = response.context['form']
+                self.assertTrue(form.is_valid())
+                result = response.context['result']
+                self.assertEqual(result['photoes'][index[0]], self.photo)
+                self.assertEqual(result['videos'][index[0]], self.video)
+                self.assertEqual(result['incomes'][index[0]], self.income)
+                self.assertEqual(result['labels'][index[0]], index[1])
+
+    def test_post_request_to_total_page(self):
+        data_form = {'year': self.year, 'month': self.month_no}
+        data = {**data_form, **data_form}
         response = self.authorized_client.post(
-            reverse('graphic'), data=data, follow=True
+            reverse('total'), data=data, follow=True
         )
-        # result = response.context['result']
-        # self.assertEqual(result['photoes'][self.date - 1], self.photoes)
+        self.assertEqual(
+            response.context['stocks'][0][0], self.stock.pseudo_name
+        )
+        self.assertEqual(
+            response.context['stocks'][0][1], self.photo
+        )
+        self.assertEqual(
+            response.context['stocks'][0][2], self.video
+        )
+        self.assertEqual(
+            response.context['stocks'][0][3], self.income
+        )
+        self.assertEqual(
+            response.context['labels'][0], self.stock.pseudo_name
+        )
+        self.assertEqual(
+            response.context['photo'][0], self.photo
+        )
+        self.assertEqual(
+            response.context['video'][0], self.video
+        )
 
     def check_header(self, response):
         month_name = response.context['month']
