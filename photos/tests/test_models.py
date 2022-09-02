@@ -1,5 +1,6 @@
 from django.test import TestCase
-from photos.models import (Day, Month, Stock, User,)
+
+from photos.models import Day, Month, Stock, User
 
 
 class ModelsTest(TestCase):

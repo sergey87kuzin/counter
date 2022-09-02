@@ -1,16 +1,15 @@
-from django import forms
-from crum import get_current_user
+# from crum import get_current_user
 from datetime import datetime as dt
 
+from django import forms
+
 from .models import Stock
-from .vars import graphics, months, years
-# from .vars import stocks
+from .vars import graphics, months, stocks, years
 
-
-def get_stocks():
-    stock_list = Stock.objects.filter(user=get_current_user())
-    stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
-    return stocks
+# def get_stocks():
+#     stock_list = Stock.objects.filter(user=get_current_user())
+#     stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
+#     return stocks
 
 
 class MonthForm(forms.Form):
@@ -26,7 +25,7 @@ class InputForm(forms.Form):
 
 
 class GraphicForm(forms.Form):
-    stocks = get_stocks()
+    # stocks = get_stocks()
     # stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
     year = forms.ChoiceField(choices=years, label='Год')
     month = forms.ChoiceField(choices=months, label='Месяц')
@@ -35,7 +34,7 @@ class GraphicForm(forms.Form):
 
 
 class StockForm(forms.Form):
-    stocks = get_stocks()
+    # stocks = get_stocks()
     # stocks = ((stock.name, stock.pseudo_name) for stock in stock_list)
     date = forms.DateField(input_formats=['%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y'],
                            label='Дата',

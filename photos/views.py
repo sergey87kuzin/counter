@@ -1,20 +1,18 @@
 import calendar
 import datetime
 import logging
+from datetime import datetime as dt
 
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
-from datetime import datetime as dt
 
-from .forms import (GraphicForm,
-                    InputForm,
-                    MonthForm,
-                    StockCreateForm,
+from .forms import (GraphicForm, InputForm, MonthForm, StockCreateForm,
                     StockForm)
 from .models import Day, Month, Stock, StockCount
-from .vars import total_header, header_names
+from .vars import header_names
 from .vars import months_list as months
+from .vars import total_header
 
 currentMonth = datetime.datetime.now().month - 1
 currentYear = datetime.datetime.now().year
@@ -42,7 +40,7 @@ def month(request, year, month):
         return go_to_month(request, header_form)
     logger.warning(f'Month { month } of { year }, days={ days }. { dt.now() }')
     return render(request, 'month.html', {'year': year,
-                                          'month': months[month-1],
+                                          'month': months[month - 1],
                                           'header_form': header_form,
                                           'header_names': header_names,
                                           'month_obj': curr_month,
@@ -64,8 +62,8 @@ def input_value(request, year, month, date):
         day.photo = photo
         day.video = video
         day.save()
-        logger.warning(f'Input downloads: date = { date }.{ month }.{ year }' +
-                       f', counts: photo = { photo }, video = { video },' +
+        logger.warning(f'Input downloads: date = { date }.{ month }.{ year }'
+                       f', counts: photo = { photo }, video = { video },'
                        f' income = { income }. { dt.now() }')
         return redirect('months', year=year, month=month)
     return render(request, 'income.html', {'form': form,
@@ -108,7 +106,7 @@ def income(request):
             count[0].photo += photo
             count[0].income += income
             count[0].save()
-        logger.warning(f'changing income: { choosen_day }, video = { video }' +
+        logger.warning(f'changing income: { choosen_day }, video = { video }'
                        f', photo = { photo }, income = { income }.'
                        f'{ dt.now() }')
         return redirect('index')
@@ -127,7 +125,7 @@ def create_stock(request):
     if form.is_valid():
         form.instance.user = request.user
         form.save()
-        logger.warning(f'stock created: name = { form.cleaned_data["name"] }' +
+        logger.warning(f'stock created: name = { form.cleaned_data["name"] }'
                        f', pseudo_name = { form.cleaned_data["pseudo_name"] }')
         return redirect('index')
     return render(request, 'income.html', {'form': form,
@@ -267,7 +265,7 @@ def year_graphic(year, stock):
     videos = []
     incomes = []
     for month_num in range(12):
-        month = get_month(user=stock.user, year=year, month=month_num+1)
+        month = get_month(user=stock.user, year=year, month=month_num + 1)
         days = get_days(month=month)
         counts = get_counts(days=days, stock=stock)
         append_incomes(videos, photoes, incomes, counts)

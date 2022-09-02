@@ -1,16 +1,12 @@
-# import inspect
-
-from http import HTTPStatus
 from datetime import datetime as dt
+from http import HTTPStatus
 
 from django.test import Client, TestCase
 from django.urls import reverse
-# from django.forms import Form
-from photos.models import Month, Day, Stock, StockCount, User
-from photos.forms import (
-    GraphicForm, InputForm, MonthForm, StockCreateForm, StockForm
-)
-# from photos.views import logger
+
+from photos.forms import (GraphicForm, InputForm, MonthForm, StockCreateForm,
+                          StockForm)
+from photos.models import Day, Month, Stock, StockCount, User
 
 
 class MonthFormTests(TestCase):
@@ -92,10 +88,10 @@ class InputFormTest(TestCase):
         form1_data = {'year': self.year, 'month': self.month}
         form2_data = {'photo': self.photo, 'video': self.video}
         response = self.authorized_client.post(
-                    reverse('input', kwargs=test_date),
-                    data={**form1_data, **form2_data},
-                    follow=True,
-                )
+            reverse('input', kwargs=test_date),
+            data={**form1_data, **form2_data},
+            follow=True,
+        )
         self.assertRedirects(
             response, reverse('months', kwargs={'year': self.year,
                                                 'month': self.month}),
@@ -188,10 +184,10 @@ class StockFormTest(TestCase):
                       'income': self.income,
                       'stock': self.stock.name}
         response = self.authorized_client.post(
-                    reverse('income'),
-                    data={**form1_data, **form2_data},
-                    follow=True,
-                )
+            reverse('income'),
+            data={**form1_data, **form2_data},
+            follow=True,
+        )
         self.assertRedirects(response, reverse('index'))
         self.assertTrue(StockCount.objects.filter(
             photo=self.photo,
@@ -201,10 +197,10 @@ class StockFormTest(TestCase):
             income=self.income
         ).exists())
         response = self.authorized_client.post(
-                    reverse('income'),
-                    data={**form1_data, **form2_data},
-                    follow=True,
-                )
+            reverse('income'),
+            data={**form1_data, **form2_data},
+            follow=True,
+        )
         self.assertTrue(StockCount.objects.filter(
             photo=self.photo * 2,
             video=self.video * 2,
@@ -233,10 +229,10 @@ class StockCreateFormTest(TestCase):
         form1_data = {'year': dt.now().year, 'month': dt.now().month}
         form2_data = {'name': 'Shutter', 'pseudo_name': 'Шаттер'}
         response = self.authorized_client.post(
-                    reverse('create_stock'),
-                    data={**form1_data, **form2_data},
-                    follow=True,
-                )
+            reverse('create_stock'),
+            data={**form1_data, **form2_data},
+            follow=True,
+        )
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertRedirects(response, reverse('index'))
         self.assertTrue(Stock.objects.filter(
@@ -254,10 +250,10 @@ class StockCreateFormTest(TestCase):
         form1_data = {'year': dt.now().year, 'month': dt.now().month}
         form2_data = {'name': 'Shutter', 'pseudo_name': 'Шаттер'}
         response = self.authorized_client.post(
-                        reverse('create_stock'),
-                        data={**form1_data, **form2_data},
-                        follow=True,
-                    )
+            reverse('create_stock'),
+            data={**form1_data, **form2_data},
+            follow=True,
+        )
         self.assertEqual(response.status_code, HTTPStatus.OK)
         form = StockCreateForm(data=form2_data)
         self.assertEqual(

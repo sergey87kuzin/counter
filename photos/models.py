@@ -1,11 +1,10 @@
 import calendar
 import datetime as dt
 
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 
 from .vars import months_list as months
-
 
 User = get_user_model()
 
@@ -35,6 +34,9 @@ class Day(models.Model):
                               related_name='month')
     photo = models.IntegerField(verbose_name='Фото', blank=True, null=True)
     video = models.IntegerField(verbose_name='Видео', blank=True, null=True)
+
+    class Meta:
+        ordering = ('pk',)
 
     def __str__(self):
         return (f'{self.date} {months[self.month.month_list - 1]}'

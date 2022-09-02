@@ -13,7 +13,7 @@ html {
 
 body {
     background-color: var(--white);
-    background: url(squirell.jpeg);
+    background: url(turtle.jpeg);
     background-size: cover;
     color: var(--black);
     font-size: 1.5rem;
@@ -27,7 +27,7 @@ ul {
 .card {
     width: 100%;
     height: 100%;
-    background: url(squirell.jpeg);
+    background: url(turtle.jpeg);
     max-width: 200rem;
     max-height: 200rem;
     margin: auto auto;
@@ -85,14 +85,14 @@ ul {
     border-radius: var(--radius);
 }
 
-.modalDialog {
+/* .modalDialog {
     position: fixed;
     font-family: Arial, Helvetica, sans-serif;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    /* background: var(--gray); */
+    background: var(--gray);
     z-index: 99999;
     -webkit-transition: opacity 400ms ease-in;
     -moz-transition: opacity 400ms ease-in;
@@ -117,7 +117,7 @@ ul {
     background: -moz-linear-gradient(#fff, #999);
     background: -webkit-linear-gradient(#fff, #999);
     background: -o-linear-gradient(#fff, #999);
-    }
+    } */
 
 .reference {
     display: inline-block;
@@ -160,6 +160,7 @@ ul {
 .header{
     display:table-header-group;
     width: 100%;
+    max-height: 30px;
 }
 
 .row {
@@ -172,7 +173,7 @@ ul {
     vertical-align: middle;
     align-content: flex-end;
     width: 35%;
-    max-height: 10%;
+    max-height: 30px;
 }
 
 .block {

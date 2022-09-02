@@ -3,6 +3,7 @@ from datetime import datetime as dt
 from django import forms
 from django.test import Client, TestCase
 from django.urls import reverse
+
 from photos.models import Day, Month, Stock, StockCount, User
 from photos.vars import months_list as months
 from photos.views import get_days
@@ -15,7 +16,7 @@ class ViewsTest(TestCase):
         cls.user = User.objects.create(username='Anon')
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user)
-        cls.month_no = 7
+        cls.month_no = 8
         cls.year = 2022
         cls.photo = 3
         cls.video = 5
