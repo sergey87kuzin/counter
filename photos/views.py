@@ -212,16 +212,14 @@ def total(request):
 
 
 def get_month(user, year, month):
-    # curr_month = Month.objects.filter(user=user,
-    #                                   month_list=month,
-    #                                   year_list=year).last()
-    # if not curr_month:
-    #     curr_month = Month.objects.create(user=user,
-    #                                       month_list=month,
-    #                                       year_list=year)
-    return Month.objects.get_or_create(user=user,
-                                       month_list=month,
-                                       year_list=year)
+    curr_month = Month.objects.filter(user=user,
+                                      month_list=month,
+                                      year_list=year).last()
+    if not curr_month:
+        curr_month = Month.objects.create(user=user,
+                                          month_list=month,
+                                          year_list=year)
+    return curr_month
 
 
 def get_days(month):
