@@ -97,9 +97,9 @@ DATABASES = {
     }
 }
 
-# if 'test' in sys.argv:  # Covers regular testing and django-coverage
-#     DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
-#     DATABASES['default']['NAME'] = ':memory:'
+if 'test' in sys.argv:  # Covers regular testing and django-coverage
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
+    DATABASES['default']['NAME'] = ':memory:'
 
 
 # Password validation
