@@ -14,8 +14,8 @@ from .vars import header_names
 from .vars import months_list as months
 from .vars import total_header
 
-currentMonth = datetime.datetime.now().month - 1
-currentYear = datetime.datetime.now().year
+current_month = datetime.datetime.now().month - 1
+current_year = datetime.datetime.now().year
 logger = logging.getLogger('django')
 
 
@@ -25,9 +25,9 @@ def index(request):
     logger.warning(f'Home page { dt.now() }')
     if 'header_button' in request.POST:
         return go_to_month(request, header_form)
-    return render(request, 'index.html', {'month': months[currentMonth],
-                                          'month_number': currentMonth,
-                                          'year': currentYear,
+    return render(request, 'index.html', {'month': months[current_month],
+                                          'month_number': current_month,
+                                          'year': current_year,
                                           'header_form': header_form})
 
 
@@ -68,8 +68,8 @@ def input_value(request, year, month, date):
         return redirect('months', year=year, month=month)
     return render(request, 'income.html', {'form': form,
                                            'header_form': header_form,
-                                           'year': currentYear,
-                                           'month': months[currentMonth]})
+                                           'year': current_year,
+                                           'month': months[current_month]})
 
 
 @login_required
@@ -112,8 +112,8 @@ def income(request):
         return redirect('index')
     return render(request, 'income.html', {'form': form,
                                            'header_form': header_form,
-                                           'year': currentYear,
-                                           'month': months[currentMonth]})
+                                           'year': current_year,
+                                           'month': months[current_month]})
 
 
 @login_required
@@ -130,8 +130,8 @@ def create_stock(request):
         return redirect('index')
     return render(request, 'income.html', {'form': form,
                                            'header_form': header_form,
-                                           'year': currentYear,
-                                           'month': months[currentMonth]})
+                                           'year': current_year,
+                                           'month': months[current_month]})
 
 
 @login_required
@@ -160,14 +160,14 @@ def graphic(request):
             result = month_diagram(request=request, month=month)
         context = {'form': form,
                    'header_form': header_form,
-                   'year': currentYear,
-                   'month': months[currentMonth],
+                   'year': current_year,
+                   'month': months[current_month],
                    'result': result}
         return render(request, 'graphic.html', context)
     return render(request, 'income.html', {'form': form,
                                            'header_form': header_form,
-                                           'year': currentYear,
-                                           'month': months[currentMonth]})
+                                           'year': current_year,
+                                           'month': months[current_month]})
 
 
 @login_required
@@ -198,8 +198,8 @@ def total(request):
             stocks_table.append(stock_line)
         return render(request, 'total.html',
                       {'header_form': header_form,
-                       'year': currentYear,
-                       'month': months[currentMonth],
+                       'year': current_year,
+                       'month': months[current_month],
                        'stocks': stocks_table,
                        'header_cells': total_header,
                        'labels': labels,
@@ -207,19 +207,21 @@ def total(request):
                        'video': video_count})
     return render(request, 'income.html', {'form': form,
                                            'header_form': header_form,
-                                           'year': currentYear,
-                                           'month': months[currentMonth]})
+                                           'year': current_year,
+                                           'month': months[current_month]})
 
 
 def get_month(user, year, month):
-    curr_month = Month.objects.filter(user=user,
-                                      month_list=month,
-                                      year_list=year).last()
-    if not curr_month:
-        curr_month = Month.objects.create(user=user,
-                                          month_list=month,
-                                          year_list=year)
-    return curr_month
+    # curr_month = Month.objects.filter(user=user,
+    #                                   month_list=month,
+    #                                   year_list=year).last()
+    # if not curr_month:
+    #     curr_month = Month.objects.create(user=user,
+    #                                       month_list=month,
+    #                                       year_list=year)
+    return Month.objects.get_or_create(user=user,
+                                       month_list=month,
+                                       year_list=year)
 
 
 def get_days(month):
@@ -301,6 +303,7 @@ def go_to_month(request, header_form):
         return redirect('months',
                         int(header_form.cleaned_data['year']),
                         int(header_form.cleaned_data['month']))
+    return redirect('index')
 
 
 def get_stock_list(request):
